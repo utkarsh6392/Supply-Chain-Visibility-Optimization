@@ -6,40 +6,65 @@ An end-to-end Power BI analytics solution designed to evaluate inventory health,
 
 ## Executive Summary
 
-* **Inventory Optimization:** Identified slow-moving and dead stock risks to minimize carrying costs and increase stock velocity.
-* **Fulfillment Efficiency:** Benchmarked scheduled vs. actual shipping days to reduce late delivery risk across regions and shipping modes.
-* **Interactive Drill-Downs:** Implemented multi-level location (Region -> Order Country -> Order City) and product (Category -> Product Name) hierarchies for granular analysis.
+- **Inventory Optimization:** Identified slow-moving and dead stock risks to minimize carrying costs and improve stock turnover.
+- **Fulfillment Efficiency:** Compared scheduled and actual shipping times to monitor delivery performance and reduce delays.
+- **Interactive Drill-Downs:** Implemented hierarchical analysis for geography (Region → Country → City) and products (Category → Product Name).
 
 ---
 
 ## Data Model & Schema Overview
 
-The solution utilizes a star schema data structure centered around a consolidated fact table containing sales, shipping, and inventory transactions.
+The dashboard follows a **Star Schema** with a centralized **Fact Table** containing sales, inventory, and shipping transactions.
 
-### Key Dimensions & Hierarchies
-* **Geography Hierarchy:** `region` -> `order_country` -> `order_city`
-* **Product Hierarchy:** `category_name` -> `product_name`
-* **Temporal Axis:** `order_date_(dateorders)` mapped across fiscal quarters and years
+### Dimension Hierarchies
+- **Geography:** `Region → Order Country → Order City`
+- **Product:** `Category Name → Product Name`
+- **Time:** `Order Date → Quarter → Year`
 
 ---
 
-## Inventory Analytics Methodology
+# Inventory Analytics
 
-### 1. Inventory Turnover Calculation Approach
-The Inventory Turnover Ratio measures how efficiently inventory is sold and replaced over a given period. To avoid distortion from point-in-time stock spikes, the ratio uses average inventory valuation:
+## Inventory Turnover Ratio
 
-$$ \text{Inventory Turnover Ratio} = \frac{\text{Total Sales}}{\text{Average Inventory Value}} $$
+Measures how efficiently inventory is sold and replenished during a given period.
 
-* **DAX Implementation:**
-  ```dax
-  Total Sales = SUM(Fact_table[sales])
+**Formula**
 
-  Avg Inventory Value = AVERAGE(Fact_table[inventory_value])
+\[
+\text{Inventory Turnover Ratio} =
+\frac{\text{Total Sales}}
+{\text{Average Inventory Value}}
+\]
 
-  Inventory Turnover Ratio = 
-  DIVIDE([Total Sales], [Avg Inventory Value], 0)
+### DAX
 
-  Days Since Last Sale (Col) = 
+```DAX
+Total Sales =
+SUM(Fact_table[sales])
+
+Avg Inventory Value =
+AVERAGE(Fact_table[inventory_value])
+
+Inventory Turnover Ratio =
+DIVIDE([Total Sales], [Avg Inventory Value], 0)
+```
+
+**Purpose**
+- Evaluate inventory efficiency.
+- Identify slow-moving inventory.
+- Support inventory planning and optimization.
+
+---
+
+## Days Since Last Sale
+
+Calculates the number of days since each product was last sold by comparing its latest sale date with the latest transaction date in the dataset.
+
+### DAX
+
+```DAX
+Days Since Last Sale (Col) =
 VAR LastSale =
     CALCULATE(
         MAX(Fact_table[order_date_(dateorders)]),
@@ -54,27 +79,106 @@ VAR MaxDate =
 
 RETURN
     DATEDIFF(LastSale, MaxDate, DAY)
+```
 
+**Purpose**
+- Detect inactive products.
+- Identify dead or slow-moving stock.
+- Improve inventory planning.
 
-    On-Time Delivery Rate = 
+---
+
+# Delivery Performance Analytics
+
+## On-Time Delivery Rate
+
+Calculates the percentage of orders delivered on time.
+
+### DAX
+
+```DAX
+On-Time Delivery Rate =
 DIVIDE(
-    CALCULATE(COUNTROWS(Fact_table), Fact_table[Late_delivery_risk] = 0),
+    CALCULATE(
+        COUNTROWS(Fact_table),
+        Fact_table[Late_delivery_risk] = 0
+    ),
     COUNTROWS(Fact_table),
     0
 )
+```
 
+**Purpose**
+- Measure delivery reliability.
+- Monitor fulfillment performance.
+- Track logistics efficiency.
 
-Avg Shipping Days Real = AVERAGE(Fact_table[Days for shipping (real)])
+---
 
-Avg Shipping Days Scheduled = AVERAGE(Fact_table[Days for shipment (scheduled)])
+## Average Shipping Days (Actual)
 
-Avg Delivery Delay Days = [Avg Shipping Days Real] - [Avg Shipping Days Scheduled]
+Calculates the average actual shipping duration.
 
+### DAX
 
+```DAX
+Avg Shipping Days Real =
+AVERAGE(Fact_table[Days for shipping (real)])
+```
 
-On-Time Delivery Rate = 
-DIVIDE(
-    CALCULATE(COUNTROWS(Fact_table), Fact_table[Late_delivery_risk] = 0),
-    COUNTROWS(Fact_table),
-    0
-)
+---
+
+## Average Shipping Days (Scheduled)
+
+Calculates the average planned shipping duration.
+
+### DAX
+
+```DAX
+Avg Shipping Days Scheduled =
+AVERAGE(Fact_table[Days for shipment (scheduled)])
+```
+
+---
+
+## Average Delivery Delay
+
+Measures the average difference between actual and scheduled shipping time.
+
+### DAX
+
+```DAX
+Avg Delivery Delay Days =
+[Avg Shipping Days Real] -
+[Avg Shipping Days Scheduled]
+```
+
+**Purpose**
+- Quantify shipping delays.
+- Compare planned vs. actual delivery performance.
+- Highlight logistics bottlenecks.
+
+---
+
+# Dashboard Features
+
+- Inventory Turnover Analysis
+- Dead Stock Identification
+- Days Since Last Sale Tracking
+- On-Time Delivery KPI
+- Average Delivery Delay Monitoring
+- Shipping Performance Analysis
+- Regional Performance Analysis
+- Product Category Analysis
+- Interactive Drill-through and Filters
+- Dynamic KPIs and Visualizations
+
+---
+
+# Business Impact
+
+- Reduced inventory carrying costs through better stock visibility.
+- Identified slow-moving and inactive products for inventory optimization.
+- Improved delivery performance monitoring using real-time KPIs.
+- Enabled data-driven supply chain decisions with interactive dashboards.
+- Enhanced operational efficiency through detailed regional and product-level analysis.
