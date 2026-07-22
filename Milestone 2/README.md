@@ -38,3 +38,43 @@ $$ \text{Inventory Turnover Ratio} = \frac{\text{Total Sales}}{\text{Average Inv
 
   Inventory Turnover Ratio = 
   DIVIDE([Total Sales], [Avg Inventory Value], 0)
+
+  Days Since Last Sale (Col) = 
+VAR LastSale =
+    CALCULATE(
+        MAX(Fact_table[order_date_(dateorders)]),
+        ALLEXCEPT(Fact_table, Fact_table[product_name])
+    )
+
+VAR MaxDate =
+    CALCULATE(
+        MAX(Fact_table[order_date_(dateorders)]),
+        ALL(Fact_table)
+    )
+
+RETURN
+    DATEDIFF(LastSale, MaxDate, DAY)
+
+
+    On-Time Delivery Rate = 
+DIVIDE(
+    CALCULATE(COUNTROWS(Fact_table), Fact_table[Late_delivery_risk] = 0),
+    COUNTROWS(Fact_table),
+    0
+)
+
+
+Avg Shipping Days Real = AVERAGE(Fact_table[Days for shipping (real)])
+
+Avg Shipping Days Scheduled = AVERAGE(Fact_table[Days for shipment (scheduled)])
+
+Avg Delivery Delay Days = [Avg Shipping Days Real] - [Avg Shipping Days Scheduled]
+
+
+
+On-Time Delivery Rate = 
+DIVIDE(
+    CALCULATE(COUNTROWS(Fact_table), Fact_table[Late_delivery_risk] = 0),
+    COUNTROWS(Fact_table),
+    0
+)
