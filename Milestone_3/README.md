@@ -1,20 +1,30 @@
-# 🚚 Transportation & Supplier Analytics Dashboard
+# Transportation & Supplier Analytics Dashboard
 
-An end-to-end analytics project designed to evaluate supplier performance, analyze transportation cost efficiencies, benchmark carrier reliability, and deliver actionable supply chain optimizations.
-
----
-
-## 📄 Overview
-
-This repository contains data models, DAX measures, and visual analytical frameworks for tracking transportation logistics and supplier performance. The goal is to identify cost-saving opportunities, reduce late shipments, and optimize carrier selection across global markets.
+An end-to-end supply chain analytics project designed to evaluate supplier performance, analyze transportation cost efficiencies, benchmark carrier reliability, and deliver actionable operational optimizations.
 
 ---
 
-## 📊 Performance & Calculation Methodologies
+## Overview
+
+This repository contains data models, DAX measures, and interactive visual frameworks for tracking global transportation logistics and vendor performance. The objective of this project is to provide data-driven insights that identify cost-saving opportunities, reduce order latency, optimize carrier selection, and mitigate supply chain bottlenecks across global markets.
+
+---
+
+## Data Pipeline & Architecture
+
+1. **Data Ingestion & Cleaning:** Raw transactional shipping data and vendor records are imported, sanitized, and normalized in Power Query (removing missing values, standardizing dates, and mapping market codes).
+2. **Data Modeling:** Built using a standard **Star Schema** to optimize query performance and DAX aggregation speed.
+   - **Fact Table:** `Fact_Shipments` (Order ID, Ship Date, Freight Cost, Discounts, Profit, Delivery Status)
+   - **Dimension Tables:** `Dim_Supplier`, `Dim_ShippingMode`, `Dim_Geography`, `Dim_Calendar`
+3. **Analytics Engine:** Custom DAX measures for dynamic time-intelligence, weighted benchmarking, and tiered KPI metrics.
+
+---
+
+## Performance & Calculation Methodologies
 
 ### 1. Supplier Scorecard Calculation Methodology
 
-The **Supplier Overall Score** is calculated using a multi-criteria weighted scoring model across key operational pillars:
+The **Supplier Overall Score** is calculated using a multi-criteria weighted scoring model across three core operational pillars:
 
 $$\text{Supplier Score} = (W_1 \times \text{OTD}) + (W_2 \times \text{Defect Rate Score}) + (W_3 \times \text{Cost Competitiveness})$$
 
@@ -22,47 +32,49 @@ $$\text{Supplier Score} = (W_1 \times \text{OTD}) + (W_2 \times \text{Defect Rat
 
 * **On-Time Delivery Rate (OTD) [Weight: 40%]**
   $$\text{OTD \%} = \left( \frac{\text{Total On-Time Deliveries}}{\text{Total Completed Orders}} \right) \times 100$$
+
 * **Defect / Return Rate [Weight: 35%]**
   $$\text{Defect Rate \%} = \left( \frac{\text{Total Damaged / Returned Units}}{\text{Total Delivered Units}} \right) \times 100$$
+
 * **Average Discount & Cost Efficiency [Weight: 25%]**
-  Evaluates supplier pricing compliance against baseline market targets and contract margins.
+  Evaluates vendor contract adherence and pricing competitiveness relative to baseline market standard rates.
 
 ---
 
 ### 2. Supplier Ranking and Benchmarking Approach
 
-Suppliers and shipping modes are benchmarked across a four-tier performance system based on their overall calculated score:
+Suppliers and shipping modes are benchmarked across a four-tier performance framework based on their cumulative weighted score:
 
 | Performance Tier | Score Range | Classification | Action / Recommendation |
 | :--- | :--- | :--- | :--- |
-| **Tier 1** | $90\% - 100\%$ | **Preferred** | Eligible for long-term contract lock-ins and higher volume allocation. |
-| **Tier 2** | $75\% - 89\%$ | **Standard** | Meets baseline operational requirements; target for minor optimizations. |
-| **Tier 3** | $60\% - 74\%$ | **Underperforming** | Requires active performance improvement plan (PIP) and closer audit. |
-| **Tier 4** | $< 60\%$ | **High-Risk** | Phase out or renegotiate SLAs immediately. |
+| **Tier 1** | $90\% - 100\%$ | **Preferred** | High priority for volume allocation and multi-year contract renewals. |
+| **Tier 2** | $75\% - 89\%$ | **Standard** | Meets baseline operational requirements; target for minor SLA tweaks. |
+| **Tier 3** | $60\% - 74\%$ | **Underperforming** | Subject to Performance Improvement Plans (PIPs) and active audit tracking. |
+| **Tier 4** | $< 60\%$ | **High-Risk** | Transition allocation away or terminate active vendor agreements. |
 
 #### Benchmarking Metrics:
-* **Peer Group Analysis:** Suppliers are compared against regional averages (`Market` & `Sub-region`) to eliminate geographic bias.
-* **Volume-Weighted Profitability:** Ranks carriers not just on raw speed, but on net profit contribution per shipment.
+* **Peer Group Normalization:** Vendors are benchmarked within their specific geographic segment (`Market` & `Sub-region`) to eliminate geographic latency bias.
+* **Volume-Weighted Profitability:** Ranks logistics providers based on net profit contribution per shipment rather than speed alone.
 
 ---
 
 ### 3. Transportation Cost Analysis Methodology
 
-Transportation cost efficiency is measured by balancing unit cost, order volume, and discount structures across shipping classes (**Standard Class**, **Second Class**, **First Class**, **Same Day**).
+Transportation cost efficiency is evaluated by assessing the interaction between unit costs, volume distributions, and applied discount structures across shipping classes (**Standard Class**, **Second Class**, **First Class**, **Same Day**).
 
-#### Key Measures:
+#### Key Measures & Formulas:
 
-* **Average Cost / Profit Per Order:**
+* **Average Profit Per Order:**
   $$\text{Avg Profit Per Order} = \frac{\sum \text{Total Profit}}{\text{Total Orders}}$$
 
 * **Effective Discount Rate (%):**
   $$\text{Avg Discount Rate \%} = \frac{\sum \text{Discount Amount}}{\sum \text{Gross Order Value}}$$
 
 * **Cost-to-Volume Ratio:**
-  Evaluates whether volume-heavy shipping channels (e.g., *Standard Class*) achieve expected economies of scale without eroding total profit margins.
+  Evaluates whether high-volume shipping modes (e.g., Standard Class) achieve target economies of scale without eroding total profit margins.
 
 ---
 
 ### 4. Route and Carrier Performance Evaluation
 
-Routes and shipping modes are analyzed continuously using a two-factor matrix: **Reliability** vs. **Cost Impact**.
+Routes and shipping modes are continuously monitored on a two-factor axis: **Reliability (Late Rate)** vs. **Profit Contribution**.
